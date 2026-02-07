@@ -591,13 +591,19 @@ function moveDrag(e) {
   $dragPreview.style.left = (pt.clientX - pw / 2) + 'px';
   $dragPreview.style.top = (pt.clientY - ph - 40) + 'px';
 
-  // Ghost
+  // Ghost - more forgiving snap calculation
   clearGhost();
   const gridRect = $grid.getBoundingClientRect();
+  const cellW = gridRect.width / GRID;
+  const cellH = gridRect.height / GRID;
   const gx = pt.clientX - gridRect.left;
-  const gy = pt.clientY - gridRect.top - (cellSize * 2.5);
-  const gc = Math.round(gx / (gridRect.width / GRID) - (maxC - minC + 1) / 2);
-  const gr = Math.round(gy / (gridRect.height / GRID) - (maxR - minR + 1) / 2);
+  const gy = pt.clientY - gridRect.top - (cellSize * 2);
+  
+  // Calculate the grid position with better centering
+  const pieceW = (maxC - minC + 1);
+  const pieceH = (maxR - minR + 1);
+  const gc = Math.floor((gx - cellW * pieceW / 2 + cellW / 2) / cellW);
+  const gr = Math.floor((gy - cellH * pieceH / 2 + cellH / 2) / cellH);
 
   const adjusted = cells.map(([r,c]) => [r - minR + gr, c - minC + gc]);
   const valid = canPlace(adjusted);
